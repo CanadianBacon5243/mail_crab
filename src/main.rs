@@ -1,9 +1,8 @@
 use clap::Parser;
+use iced::Application;
 
-fn main() {
-    let args = Args::parse();
-
-    println!("{}", fetch_inbox_one_item(&args.user, &args.pass, &args.server, args.index).unwrap().unwrap())
+pub fn main() -> iced::Result {
+    Mail::run(iced::Settings::default())
 }
 
 #[derive(Parser, Debug)]
@@ -24,6 +23,34 @@ struct Args{
     /// Which email to fetch
     #[arg(short, long)]
     index: u32
+}
+
+struct Mail {
+    body: String
+}
+
+#[derive(Debug, Clone, Copy)]
+enum Message {
+
+}
+
+impl iced::Sandbox for Mail {
+    type Message = Message;
+    fn new() -> Self {
+        let args = Args::parse();
+        Self {
+            body: fetch_inbox_one_item(&args.user, &args.pass, &args.server, args.index).unwrap().unwrap()
+        }
+    }
+    fn title(&self) -> String {
+        String::from("Mail Crab")
+    }
+    fn update(&mut self, _message: Message) {
+
+    }
+    fn view(&self) -> iced::Element<Message> {
+        iced::widget::column![iced::widget::text(self.body.clone())].into()
+    }
 }
 
 //based off the example of the imap documentation
